@@ -1,0 +1,7 @@
+[site]
+name = "Cobalt"
+title = "site | page"
+
+[style]
+default = "style.css"
+external = ["https://github.com"]

@@ -1,0 +1,1 @@
+//! Provides a simple Cobalt-to-HTML emitter.

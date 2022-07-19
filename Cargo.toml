@@ -1,0 +1,17 @@
+[package]
+name = "cobalt-web"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "cobalt"
+path = "src/main.rs"
+
+[dependencies]
+toml = "0.5.9"
+walkdir = "2.3.2"
+colored = "2.0.0"
+serde = "1.0.139"
+serde_derive = "1.0.139"

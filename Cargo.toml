@@ -1,7 +1,11 @@
 [package]
 name = "cobalt-web"
+description = "A simple static web framework, enabling individuals to build beautiful websites fast.  Written in Rust."
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+authors = ["Joseph Hobbs"]
+repository = "https://github.com/hobbsbros/cobalt.git"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

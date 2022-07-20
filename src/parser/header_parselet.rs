@@ -1,12 +1,15 @@
 //! Provides a parselet for headers.
 
-use crate::parser::{
-    Token,
-    TokenType,
-    Tokenizer,
-    Parser,
-    Expression,
-    Parselet,
+use crate::{
+    parser::{
+        Token,
+        TokenType,
+        Tokenizer,
+        Parser,
+        Expression,
+        Parselet,
+    },
+    error::{throw, Error},
 };
 
 pub struct HeaderParselet;
@@ -21,7 +24,7 @@ impl Parselet for HeaderParselet {
             TokenType::H4 => Expression::H4 (token.get_value()),
             TokenType::H5 => Expression::H5 (token.get_value()),
             TokenType::H6 => Expression::H6 (token.get_value()),
-            _ => todo!(),
+            _ => throw(Error::ExpectedHeading (token.get_value()))
         }
     }
 }

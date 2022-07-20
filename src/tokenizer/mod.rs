@@ -4,6 +4,8 @@ pub mod token;
 
 pub use token::{Token, TokenType};
 
+use crate::error::{throw, Error};
+
 /// Provides `peek()` and `next()` methods on characters coming in from the Cobalt source file.
 pub struct Charstream {
     chars: Vec<char>,
@@ -152,7 +154,7 @@ impl Tokenizer {
                     4 => Token::new(TokenType::H4, current),
                     5 => Token::new(TokenType::H5, current),
                     6 => Token::new(TokenType::H6, current),
-                    _ => todo!(),
+                    _ => throw(Error::TooManyHeadings),
                 }
             },
             '[' => {
@@ -225,7 +227,7 @@ impl Tokenizer {
     pub fn peek_unwrap(&self) -> Token {
         match self.peek() {
             Some(t) => t,
-            None => todo!(),
+            None => throw(Error::UnexpectedEof),
         }
     }
 
@@ -240,7 +242,7 @@ impl Tokenizer {
     pub fn next_unwrap(&mut self) -> Token {
         match self.next() {
             Some(t) => t,
-            None => todo!(),
+            None => throw(Error::UnexpectedEof),
         }
     }
 

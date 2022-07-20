@@ -1,12 +1,15 @@
 //! Provides a parselet for hyperlinks.
 
-use crate::parser::{
-    Token,
-    TokenType,
-    Tokenizer,
-    Parser,
-    Expression,
-    Parselet,
+use crate::{
+    parser::{
+        Token,
+        TokenType,
+        Tokenizer,
+        Parser,
+        Expression,
+        Parselet,
+    },
+    error::{throw, Error},
 };
 
 pub struct HyperlinkParselet;
@@ -25,7 +28,7 @@ impl Parselet for HyperlinkParselet {
                 href,
             }
         } else {
-            todo!();
+            throw(Error::ExpectedParen (token.get_value()));
         }
     }
 }

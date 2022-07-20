@@ -1,0 +1,37 @@
+h1 {
+    color: green;
+    text-align: center;
+    font-family: "Secular One";
+}
+
+body {
+    background-color: #C0C0C0;
+    font-family: "Maven Pro";
+}
+
+::selection {
+    background: #a10000;
+    color: white;
+}
+
+.center {
+    display: block;
+    box-shadow: 10px 10px black;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.download {
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    background-color: blue;
+    color: white;
+    padding: 10px;
+    transition: 0.5s;
+}
+
+.download:hover {
+    background-color: red;
+    transition: 0.5s;
+}

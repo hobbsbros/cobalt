@@ -2,6 +2,7 @@
 
 use crate::{
     parser::Expression,
+    error::{throw, Error},
     Config,
 };
 
@@ -62,7 +63,7 @@ impl Html {
             "site" => format!("<title>{}</title>\n", &self.site),
             "page | site" => format!("<title>{} | {}</title>\n", &self.page, &self.site),
             "site | page" => format!("<title>{} | {}</title>\n", &self.site, &self.page),
-            _ => todo!(),
+            _ => throw(Error::InvalidConfig (protocol.to_string())),
         }
     }
 }
@@ -88,7 +89,7 @@ impl Emitter {
                 Some(i) => {
                     // Class and ID
                     format!(
-                        "<{} class={} id={} {}=\"{}\">",
+                        "<{} class=\"{}\" id=\"{}\" {}=\"{}\">",
                         &name,
                         &c,
                         &i,
@@ -99,7 +100,7 @@ impl Emitter {
                 None => {
                     // Class, no ID
                     format!(
-                        "<{} class={} {}=\"{}\">",
+                        "<{} class=\"{}\" {}=\"{}\">",
                         &name,
                         &c,
                         &tag,
@@ -111,7 +112,7 @@ impl Emitter {
                 Some(i) => {
                     // No Class but ID
                     format!(
-                        "<{} id={} {}=\"{}\">",
+                        "<{} id=\"{}\" {}=\"{}\">",
                         &name,
                         &i,
                         &tag,
@@ -133,6 +134,7 @@ impl Emitter {
     /// Emits an expression into an optional page name, head code, body code.
     fn emit_expr(&self, expr: Expression) -> (Option<String>, String, String) {
         let mut site: Option<String> = None;
+        #[allow(unused_mut)]
         let mut head = String::new();
         let mut body = String::new();
 
@@ -153,14 +155,27 @@ impl Emitter {
                     c,
                     i,
                 )),
-                "script" => body.push_str(&self.emit_class_id(
-                    "script",
-                    "src",
-                    &a,
-                    c,
-                    i,
-                )),
-                _ => todo!(),
+                "script" => {
+                    body.push_str(&self.emit_class_id(
+                        "script",
+                        "src",
+                        &a,
+                        c,
+                        i,
+                    ));
+                    body.push_str("</script>");
+                },
+                "download" => {
+                    body.push_str(&self.emit_class_id(
+                        "a",
+                        "href",
+                        &a,
+                        Some("download".to_string()),
+                        i,
+                    ));
+                    body.push_str("Download</a>");
+                },
+                _ => throw(Error::InvalidCtrlSequence (k)),
             },
             Expression::Paragraph (s) => body.push_str(&format!("<p>{}</p>", &s)),
             Expression::Hyperlink {
@@ -210,8 +225,28 @@ impl Emitter {
         };
         html.push_head(&html.get_name(title_protocol));
 
+        // Emit primary stylesheet and external stylesheets.
+        let stylesheet_link = format!(
+            "<link rel=\"stylesheet\" href=\"{}\">",
+            &self.config.style.default,
+        );
+        html.push_head(&stylesheet_link);
+
+        if let Some(s) = &self.config.style.external {
+            let mut stylesheets = String::new();
+            for stylesheet in s {
+                let stylesheet_link = format!(
+                    "<link rel=\"stylesheet\" href=\"{}\">",
+                    &stylesheet,
+                );
+                stylesheets.push_str(&stylesheet_link);
+            }
+            html.push_head(&stylesheets);
+        }
+
         html.push_head("\
         </head>\n\
+        <body>\n\
         ");
 
         html.push_body("\

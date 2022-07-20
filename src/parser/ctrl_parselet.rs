@@ -1,12 +1,15 @@
 //! Provides a parselet for control sequences.
 
-use crate::parser::{
-    Token,
-    TokenType,
-    Tokenizer,
-    Parser,
-    Expression,
-    Parselet,
+use crate::{
+    parser::{
+        Token,
+        TokenType,
+        Tokenizer,
+        Parser,
+        Expression,
+        Parselet,
+    },
+    error::{throw, Error},
 };
 
 pub struct CtrlParselet;
@@ -37,10 +40,10 @@ impl Parselet for CtrlParselet {
                         argument,
                     };
                 },
-                _ => todo!(),
+                _ => throw(Error::ExpectedOpen (t.get_value())),
             }
         }
 
-        todo!();
+        throw(Error::CouldNotParse (token.get_value()));
     }
 }

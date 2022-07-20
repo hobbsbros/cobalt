@@ -3,15 +3,18 @@
 pub mod tokenizer;
 pub mod parser;
 pub mod emitter;
+pub mod error;
 
 use std::{
-    fs,
+    fs::{self, OpenOptions},
+    io::Write,
     ffi::OsStr,
 };
 
+use error::{throw, Error};
+
 use serde_derive::Deserialize;
 use walkdir::WalkDir;
-
 use tokenizer::Tokenizer;
 use parser::Parser;
 use emitter::Emitter;
@@ -53,7 +56,7 @@ fn main() {
     let config: String = read("cobalt.toml");
     let toml: Config = match toml::from_str(&config) {
         Ok(t) => t,
-        Err(_) => todo!(),
+        Err(_) => throw(Error::CouldNotFindToml),
     };
 
     // Holds a list of source filenames to compile.
@@ -68,7 +71,7 @@ fn main() {
     for entry in WalkDir::new(&src_directory) {
         let entry = match entry {
             Ok(e) => e,
-            Err(_) => todo!(),
+            Err(_) => throw(Error::CouldNotReadFile),
         };
         if entry.path().extension() == Some(OsStr::new("co")) {
             filenames.push(entry.path().display().to_string());
@@ -84,7 +87,12 @@ fn main() {
 
         let emitter = Emitter::new(toml.to_owned());
         let output = emitter.emit(expressions);
-        dbg!(&output);
+
+        let mut output_filename = filename.clone();
+        output_filename.truncate(output_filename.len() - 3);
+        output_filename.push_str(".html");
+
+        write(&output_filename, output);
     }
 }
 
@@ -93,6 +101,23 @@ fn main() {
 fn read(filename: &str) -> String {
     match fs::read_to_string(filename) {
         Ok(f) => f,
-        Err(_) => todo!(),
+        Err(_) => throw(Error::CouldNotReadFile),
     }
+}
+
+
+/// Writes a file from a `String` or throws an error if impossible.
+fn write(filename: &str, file: String) {
+    let mut output = match OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(filename.to_string()) {
+            Ok(f) => f,
+            Err(_) => throw(Error::CouldNotOpenFile (filename.to_string())),
+    };
+    match output.write_all(file.as_bytes()) {
+        Ok(_) => (),
+        Err(_) => throw(Error::CouldNotWriteFile (filename.to_string())),
+    };
 }

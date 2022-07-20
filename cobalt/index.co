@@ -6,8 +6,10 @@
 
 This is a test website made with the Cobalt static web framework!
 
+## More information
+
 And click [here](https://github.com) to be directed to Github.
 
-\image(center){example.jpg}
+\download{https://github.com/}
 
-\script{script.js}
+\image(center){example.png}

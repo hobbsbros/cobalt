@@ -4,4 +4,4 @@ title = "site | page"
 
 [style]
 default = "style.css"
-external = ["https://github.com"]
+external = ["https://fonts.googleapis.com/css2?family=Maven+Pro&family=Secular+One&display=swap"]

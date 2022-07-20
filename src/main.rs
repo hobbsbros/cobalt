@@ -13,6 +13,7 @@ use serde_derive::Deserialize;
 use walkdir::WalkDir;
 
 use tokenizer::Tokenizer;
+use parser::Parser;
 
 /// Holds website configuration information.
 #[derive(Deserialize)]
@@ -71,6 +72,14 @@ fn main() {
         if entry.path().extension() == Some(OsStr::new("co")) {
             filenames.push(entry.path().display().to_string());
         }
+    }
+
+    for filename in filenames {
+        let data = read(&filename);
+        let mut tokenizer = Tokenizer::new(data);
+
+        let parser = Parser::new();
+        dbg!(parser.parse_all(&mut tokenizer));
     }
 }
 

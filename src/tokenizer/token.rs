@@ -1,7 +1,7 @@
 //! Provides an abstraction over tokens and token types.
 
 /// Enumerates the types of possible tokens.
-#[derive(Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
 pub enum TokenType {
     Id,
     Class,

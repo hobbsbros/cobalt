@@ -2,7 +2,7 @@
 
 pub mod token;
 
-use token::{Token, TokenType};
+pub use token::{Token, TokenType};
 
 /// Provides `peek()` and `next()` methods on characters coming in from the Cobalt source file.
 pub struct Charstream {

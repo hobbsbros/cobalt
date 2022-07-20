@@ -6,7 +6,11 @@ pub mod emitter;
 pub mod error;
 
 use std::{
-    fs::{self, OpenOptions},
+    fs::{
+        self,
+        OpenOptions,
+    },
+    env,
     io::Write,
     ffi::OsStr,
 };
@@ -40,7 +44,7 @@ pub struct Site {
 
     // Holds the Cobalt source directory.
     // 
-    // If not specified, Cobalt defaults to the directory name "cobalt".
+    // If not specified, Cobalt defaults to the current directory.
     path: Option<String>,
 }
 
@@ -52,9 +56,30 @@ pub struct Style {
 }
 
 fn main() {
-    // Import and parse the configuration file
-    let config: String = read("cobalt.toml");
-    let toml: Config = match toml::from_str(&config) {
+    // Import and parse the configuration file.
+    let mut config: String = String::new();
+
+    // Recurse through current and parent directories to find configuration file.
+    let working_dir = match env::current_dir() {
+        Ok(p) => p,
+        Err(_) => throw(Error::CouldNotFindToml),
+    };
+
+    for path in working_dir.as_path().ancestors() {
+        let config_path_buf = path.join("cobalt.toml");
+        let config_path = config_path_buf.as_path();
+        let string = match config_path.to_path_buf().into_os_string().into_string() {
+            Ok(c) => c,
+            Err(_) => throw(Error::CouldNotFindToml),
+        };
+        if config_path.is_file() {
+            config = string;
+            break;
+        }
+    }
+
+    let file = read(&config);
+    let toml: Config = match toml::from_str(&file) {
         Ok(t) => t,
         Err(_) => throw(Error::CouldNotFindToml),
     };
@@ -65,7 +90,7 @@ fn main() {
     // Recursively walks through the current directory to search for source files.
     let src_directory = match toml.site.path.clone() {
         Some(s) => s,
-        None => "cobalt".to_string(),
+        None => ".".to_string(),
     };
 
     for entry in WalkDir::new(&src_directory) {

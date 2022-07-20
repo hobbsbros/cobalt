@@ -1,5 +1,7 @@
 //! Provides a simple Cobalt-to-HTML emitter.
 
+use std::fs;
+
 use crate::{
     parser::Expression,
     error::{throw, Error},
@@ -226,15 +228,31 @@ impl Emitter {
         html.push_head(&html.get_name(title_protocol));
 
         // Emit primary stylesheet and external stylesheets.
+        let stylesheet_path = match fs::canonicalize(self.config.style.default.to_owned()) {
+            Ok(p) => p,
+            Err(_) => throw(Error::CouldNotOpenFile (self.config.style.default.to_owned())),
+        };
+        let stylesheet = match stylesheet_path.into_os_string().into_string() {
+            Ok(s) => s,
+            Err(_) => throw(Error::CouldNotOpenFile (self.config.style.default.to_owned())),
+        };
         let stylesheet_link = format!(
             "<link rel=\"stylesheet\" href=\"{}\">",
-            &self.config.style.default,
+            &stylesheet,
         );
         html.push_head(&stylesheet_link);
 
         if let Some(s) = &self.config.style.external {
             let mut stylesheets = String::new();
             for stylesheet in s {
+                let stylesheet_path = match fs::canonicalize(stylesheet.to_owned()) {
+                    Ok(p) => p,
+                    Err(_) => throw(Error::CouldNotOpenFile (stylesheet.to_owned())),
+                };
+                let stylesheet = match stylesheet_path.into_os_string().into_string() {
+                    Ok(s) => s,
+                    Err(_) => throw(Error::CouldNotOpenFile (stylesheet.to_owned())),
+                };
                 let stylesheet_link = format!(
                     "<link rel=\"stylesheet\" href=\"{}\">",
                     &stylesheet,

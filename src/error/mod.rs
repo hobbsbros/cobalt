@@ -26,7 +26,7 @@ use Error::*;
 pub fn throw(error: Error) -> ! {
     let msg = match error {
         CouldNotReadFile => format!("Could not read input file"),
-        CouldNotFindToml => format!("Could not find configuration file 'cobalt.toml'"),
+        CouldNotFindToml => format!("Could not find or parse configuration file 'cobalt.toml'"),
         CouldNotWriteFile (s) => format!("Could not write to file {}", s),
         CouldNotOpenFile (s) => format!("Could not open file {}", s),
         InvalidConfig (s) => format!("Invalid configuration sequence: {}", s),

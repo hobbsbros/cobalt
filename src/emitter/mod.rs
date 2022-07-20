@@ -1,9 +1,6 @@
 //! Provides a simple Cobalt-to-HTML emitter.
 
-use std::{
-    fs,
-    path::Path,
-};
+use std::path::Path;
 
 use crate::{
     parser::Expression,
@@ -245,14 +242,6 @@ impl Emitter {
         if let Some(s) = &self.config.style.external {
             let mut stylesheets = String::new();
             for stylesheet in s {
-                let stylesheet_path = match fs::canonicalize(stylesheet.to_owned()) {
-                    Ok(p) => p,
-                    Err(_) => throw(Error::CouldNotOpenFile (stylesheet.to_owned())),
-                };
-                let stylesheet = match stylesheet_path.into_os_string().into_string() {
-                    Ok(s) => s,
-                    Err(_) => throw(Error::CouldNotOpenFile (stylesheet.to_owned())),
-                };
                 let stylesheet_link = format!(
                     "<link rel=\"stylesheet\" href=\"{}\">",
                     &stylesheet,

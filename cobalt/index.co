@@ -8,8 +8,6 @@ This is a test website made with the Cobalt static web framework!
 
 And click [here](https://github.com) to be directed to Github.
 
-\button[my-id]{CLICK HERE}
-
 \image(center){example.jpg}
 
 \script{script.js}

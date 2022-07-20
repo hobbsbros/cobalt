@@ -14,16 +14,17 @@ use walkdir::WalkDir;
 
 use tokenizer::Tokenizer;
 use parser::Parser;
+use emitter::Emitter;
 
 /// Holds website configuration information.
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct Config {
     site: Site,
     style: Style,
 }
 
 /// Holds general information about the website.
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct Site {
     // Holds the website name.
     name: String,
@@ -41,7 +42,7 @@ pub struct Site {
 }
 
 /// Holds information about the website's CSS style.
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct Style {
     default: String,
     external: Option<Vec<String>>,
@@ -59,7 +60,7 @@ fn main() {
     let mut filenames = Vec::new();
 
     // Recursively walks through the current directory to search for source files.
-    let src_directory: String = match toml.site.path {
+    let src_directory = match toml.site.path.clone() {
         Some(s) => s,
         None => "cobalt".to_string(),
     };
@@ -79,7 +80,11 @@ fn main() {
         let mut tokenizer = Tokenizer::new(data);
 
         let parser = Parser::new();
-        dbg!(parser.parse_all(&mut tokenizer));
+        let expressions = parser.parse_all(&mut tokenizer);
+
+        let emitter = Emitter::new(toml.to_owned());
+        let output = emitter.emit(expressions);
+        dbg!(&output);
     }
 }
 

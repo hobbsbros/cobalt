@@ -1,13 +1,26 @@
 //! Provides an abstraction over tokens and token types.
 
 /// Enumerates the types of possible tokens.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum TokenType {
-
+    Id,
+    Class,
+    Ctrl,
+    H1,
+    H2,
+    H3,
+    H4,
+    H5,
+    H6,
+    Paragraph,
+    Paren,
+    Bracket,
+    Brace,
 }
 
 
 /// Holds a token's type and value.
+#[derive(Clone, Debug)]
 pub struct Token {
     t: TokenType,
     v: String,

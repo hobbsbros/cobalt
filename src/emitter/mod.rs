@@ -1,6 +1,9 @@
 //! Provides a simple Cobalt-to-HTML emitter.
 
-use std::fs;
+use std::{
+    fs,
+    path::Path,
+};
 
 use crate::{
     parser::Expression,
@@ -196,7 +199,7 @@ impl Emitter {
     }
 
     /// Emits a vector of expressions into a `String`.
-    pub fn emit(&self, expressions: Vec<Expression>) -> String {
+    pub fn emit(&self, expressions: Vec<Expression>, root_directory: &Path) -> String {
         let header = "\
         <!DOCTYPE html>\n\
         <html>\n\
@@ -228,10 +231,7 @@ impl Emitter {
         html.push_head(&html.get_name(title_protocol));
 
         // Emit primary stylesheet and external stylesheets.
-        let stylesheet_path = match fs::canonicalize(self.config.style.default.to_owned()) {
-            Ok(p) => p,
-            Err(_) => throw(Error::CouldNotOpenFile (self.config.style.default.to_owned())),
-        };
+        let stylesheet_path = root_directory.join(self.config.style.default.to_owned());
         let stylesheet = match stylesheet_path.into_os_string().into_string() {
             Ok(s) => s,
             Err(_) => throw(Error::CouldNotOpenFile (self.config.style.default.to_owned())),

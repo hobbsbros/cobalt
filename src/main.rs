@@ -10,6 +10,7 @@ use std::{
         self,
         OpenOptions,
     },
+    path::Path,
     env,
     io::Write,
     ffi::OsStr,
@@ -58,6 +59,7 @@ pub struct Style {
 fn main() {
     // Import and parse the configuration file.
     let mut config: String = String::new();
+    let mut dir: String = String::new();
 
     // Recurse through current and parent directories to find configuration file.
     let working_dir = match env::current_dir() {
@@ -72,8 +74,17 @@ fn main() {
             Ok(c) => c,
             Err(_) => throw(Error::CouldNotFindToml),
         };
+        let parent_dir = match config_path.parent() {
+            Some(p) => p,
+            None => throw(Error::CouldNotFindToml),
+        };
+        let dir_string = match parent_dir.to_path_buf().into_os_string().into_string() {
+            Ok(c) => c,
+            Err(_) => throw(Error::CouldNotFindToml),
+        };
         if config_path.is_file() {
             config = string;
+            dir = dir_string;
             break;
         }
     }
@@ -90,7 +101,7 @@ fn main() {
     // Recursively walks through the current directory to search for source files.
     let src_directory = match toml.site.path.clone() {
         Some(s) => s,
-        None => ".".to_string(),
+        None => dir,
     };
 
     for entry in WalkDir::new(&src_directory) {
@@ -111,7 +122,7 @@ fn main() {
         let expressions = parser.parse_all(&mut tokenizer);
 
         let emitter = Emitter::new(toml.to_owned());
-        let output = emitter.emit(expressions);
+        let output = emitter.emit(expressions, &Path::new(&src_directory));
 
         let mut output_filename = filename.clone();
         output_filename.truncate(output_filename.len() - 3);

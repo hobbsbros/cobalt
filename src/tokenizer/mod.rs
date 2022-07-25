@@ -49,7 +49,7 @@ impl Charstream {
 
 
 const SEPARATORS: &str = "\t\n";
-const CTRL_CHARACTERS: &str = "\\#[";
+const CTRL_CHARACTERS: &str = "\\#[~";
 const END_CTRL: &str = " ()[]{}";
 
 
@@ -123,6 +123,7 @@ impl Tokenizer {
 
                 Token::new(TokenType::Ctrl, current)
             },
+            '~' => Token::new(TokenType::Fixed, current),
             '#' => {
                 // This represents a heading.
                 current = String::new();

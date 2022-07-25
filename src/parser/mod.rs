@@ -5,6 +5,7 @@ pub mod header_parselet;
 pub mod ctrl_parselet;
 pub mod paragraph_parselet;
 pub mod hyperlink_parselet;
+pub mod fixed_parselet;
 
 use std::collections::HashMap;
 
@@ -19,6 +20,7 @@ use header_parselet::HeaderParselet;
 use ctrl_parselet::CtrlParselet;
 use paragraph_parselet::ParagraphParselet;
 use hyperlink_parselet::HyperlinkParselet;
+use fixed_parselet::FixedParselet;
 
 /// Abstracts over different "expressions" in Cobalt.
 #[derive(Clone, Debug)]
@@ -40,6 +42,7 @@ pub enum Expression {
     H4 (String),
     H5 (String),
     H6 (String),
+    Fixed (Vec<Expression>),
 }
 
 
@@ -63,6 +66,7 @@ impl Parser {
         parselets.insert(TokenType::Ctrl, Box::new(CtrlParselet {}));
         parselets.insert(TokenType::Paragraph, Box::new(ParagraphParselet {}));
         parselets.insert(TokenType::Bracket, Box::new(HyperlinkParselet {}));
+        parselets.insert(TokenType::Fixed, Box::new(FixedParselet {}));
 
         Self {
             parselets,
@@ -75,7 +79,8 @@ impl Parser {
 
         let parselet = self.parselets.get(&token.get_type())?;
 
-        Some(parselet.parse(self, tokenizer, token))
+        let expr = parselet.parse(self, tokenizer, token);
+        Some(expr)
     }
 
     /// Consumes the tokenizer and returns a vector of expressions.

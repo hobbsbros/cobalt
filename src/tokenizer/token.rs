@@ -16,6 +16,7 @@ pub enum TokenType {
     Paren,
     Bracket,
     Brace,
+    Fixed,
 }
 
 

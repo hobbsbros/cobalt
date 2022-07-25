@@ -136,8 +136,7 @@ impl Emitter {
     /// Emits an expression into an optional page name, head code, body code.
     fn emit_expr(&self, expr: Expression) -> (Option<String>, String, String) {
         let mut site: Option<String> = None;
-        #[allow(unused_mut)]
-        let mut head = String::new();
+        let head = String::new();
         let mut body = String::new();
 
         match expr {
@@ -190,6 +189,15 @@ impl Emitter {
             Expression::H4 (s) => body.push_str(&format!("<h4>{}</h4>\n", &s)),
             Expression::H5 (s) => body.push_str(&format!("<h5>{}</h5>\n", &s)),
             Expression::H6 (s) => body.push_str(&format!("<h6>{}</h6>\n", &s)),
+            Expression::Fixed (expressions) => {
+                body.push_str("<div class=\"header\">");
+
+                for expr in expressions {
+                    body.push_str(&self.emit_expr(expr).2);
+                }
+
+                body.push_str("</div>");
+            },
         };
 
         (site, head, body)

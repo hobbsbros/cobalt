@@ -176,6 +176,16 @@ impl Emitter {
                     ));
                     body.push_str("Download</a>");
                 },
+                "pdf" => {
+                    body.push_str(&self.emit_class_id(
+                        "iframe",
+                        "href",
+                        &a,
+                        c,
+                        i,
+                    ));
+                    body.push_str("</iframe>");
+                },
                 _ => throw(Error::InvalidCtrlSequence (k)),
             },
             Expression::Paragraph (s) => body.push_str(&format!("<p>{}</p>", &s)),
